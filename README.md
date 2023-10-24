@@ -35,3 +35,4 @@ export default {
 		return new Response('Sent message to the queue');
 	}
 }
+```
