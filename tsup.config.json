@@ -1,0 +1,10 @@
+{
+    "entry": [
+      "src/index.ts"
+    ],
+    "dts": true,
+    "format": [
+      "cjs",
+      "esm"
+    ]
+  }
