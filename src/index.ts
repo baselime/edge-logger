@@ -4,7 +4,7 @@ export type BaselimeLog = {
 	message: string
 	error?: string
 	requestId: string
-    level: string
+	level: string
 	data: any
 }
 
@@ -18,7 +18,7 @@ try {
 	 */
 	const api = require('@opentelemetry/api');
 	tracingApi = api
-} catch(_) {
+} catch (_) {
 }
 
 export class BaselimeLogger {
@@ -35,7 +35,7 @@ export class BaselimeLogger {
 	private flushPromise: Promise<any> | null = null
 	private flushAfterMs
 	private flushAfterLogs
-    private baselimeUrl
+	private baselimeUrl
 	constructor({
 		ctx,
 		apiKey,
@@ -45,14 +45,14 @@ export class BaselimeLogger {
 		flushAfterMs,
 		flushAfterLogs,
 		requestId,
-        baselimeUrl
+		baselimeUrl
 	}: {
 		ctx: ExecutionContext
 		apiKey: string
 		dataset: string
 		service: string
 		namespace: string
-        baselimeUrl?: string
+		baselimeUrl?: string
 		flushAfterMs?: number
 		flushAfterLogs?: number
 		requestId?: string | null
@@ -64,7 +64,7 @@ export class BaselimeLogger {
 		this.namespace = namespace
 		this.flushAfterMs = flushAfterMs ?? 10000
 		this.flushAfterLogs = flushAfterLogs ?? 100
-        this.baselimeUrl = baselimeUrl ?? 'https://events.baselime.io/v1'
+		this.baselimeUrl = baselimeUrl ?? 'https://events.baselime.io/v1'
 		if (requestId) {
 			this.requestId = requestId
 		} else {
@@ -73,10 +73,10 @@ export class BaselimeLogger {
 	}
 
 	private async _log(message: string, level: string, data?: any) {
-		if(tracingApi) {
+		if (tracingApi) {
 			const span = tracingApi.trace.getActiveSpan();
 			data['traceId'] = span?.spanContext().traceId;
-		} 
+		}
 		if (data && data.level) {
 			level = data.level
 			delete data.level
@@ -141,28 +141,28 @@ export class BaselimeLogger {
 
 			try {
 
-                if(!this.apiKey) {
+				if (!this.apiKey) {
 
-                    const colors = {
-                        info: '\x1b[32m',
-                        warning: '${colors[log.level]',
-                        error: '\x1b[31m',
-                        debug: '\x1b[35m',
-                    }
+					const colors = {
+						info: '\x1b[32m',
+						warning: '${colors[log.level]',
+						error: '\x1b[31m',
+						debug: '\x1b[35m',
+					}
 
-                    const grey = `\x1b[90m`
-                    const white = `\x1b[0m`
-                    for(let log of this.logs) {
-                        console.log(`${colors[log.level]}${log.level }${grey} - ${this.requestId} - ${white}${log.message}`)
-                        delete log.level
-                        delete log.message;
-                        delete log.requestId;
-                        if(Object.values(log).length > 0) {
-                            console.log(`${grey} ${JSON.stringify(log, null, 2)}`)
-                        }
-                    }
-                    return
-                }
+					const grey = `\x1b[90m`
+					const white = `\x1b[0m`
+					for (let log of this.logs) {
+						console.log(`${colors[log.level]}${log.level}${grey} - ${this.requestId} - ${white}${log.message}`)
+						delete log.level
+						delete log.message;
+						delete log.requestId;
+						if (Object.values(log).length > 0) {
+							console.log(`${grey} ${JSON.stringify(log, null, 2)}`)
+						}
+					}
+					return
+				}
 				console.log(`${this.baselimeUrl}/${this.dataset}/${this.service}/${this.namespace}`)
 				const res = await fetch(
 					`${this.baselimeUrl}/${this.dataset}/${this.service}/${this.namespace}`,
@@ -209,8 +209,8 @@ export class BaselimeLogger {
 			msg instanceof Error
 				? msg.message + (msg.stack ? `: ${msg.stack}` : '')
 				: typeof msg === 'string'
-				? msg
-				: JSON.stringify(msg)
+					? msg
+					: JSON.stringify(msg)
 		this._log(m, 'error', data)
 	}
 
