@@ -10,11 +10,14 @@ npm i @baselime/edge-logger
 
 ### Usage
 
+> `ctx.waitUntil(logger.flush());` You must flush at the end of your invocation.
+
 ```typescript
 import { BaselimeLogger } from '@baselime/edge-logger'
 
 export interface Env {
 	BASELIME_KEY: string
+	IS_LOCAL_DEV?: string
 }
 
 export default {
@@ -26,6 +29,7 @@ export default {
 			dataset: 'cloudflare',
 			namespace: 'fetch',
 			requestId: crypto.randomUUID(),
+			isLocalDev: env.IS_LOCAL_DEV
 		})
 
 		logger.info('Hello world', { cfRay: req.headers.get('cf-ray'), foo: 'bar' })
@@ -34,6 +38,38 @@ export default {
 		return new Response('Hello world!');
 	}
 }
+```
+
+## Configuration
+
+The BaselimeLogger class takes the following configuration options
+
+| Property        | Type                | Optional | Description                    |
+|-----------------|---------------------|----------|--------------------------------|
+| `ctx`           | `ExecutionContext`  |          | Execution context              |
+| `apiKey`        | `string`            |          | API key for authentication      |
+| `dataset`       | `string`            | ✓        | Optional dataset name          |
+| `service`       | `string`            | ✓        | Optional service name          |
+| `namespace`     | `string`            | ✓        | Optional namespace             |
+| `baselimeUrl`   | `string`            | ✓        | Optional base URL              |
+| `flushAfterMs`  | `number`            | ✓        | Flush after milliseconds       |
+| `flushAfterLogs`| `number`            | ✓        | Flush after a number of logs   |
+| `requestId`     | `string`            | ✓        | Request ID   |
+| `isLocalDev`    | `boolean`           | ✓        | Indicates if it's for local development |
+
+## Local Dev
+
+For pretty formatted logs in wrangler add a .dev.var file to your wrangler project
+
+```.env
+IS_LOCAL_MODE=1
+```
+
+and 
+
+```
+
+
 ```
 
 ## Supported methods

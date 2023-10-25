@@ -30,13 +30,13 @@ export class BaselimeLogger {
 	private readonly namespace
 	private readonly logs: BaselimeLog[] = []
 	private readonly requestId
-
 	// flushTimeout is a timeout set by setTimeout() to flush the logs after a certain amount of time
 	private flushTimeout: any | null = null
 	private flushPromise: Promise<any> | null = null
 	private flushAfterMs
 	private flushAfterLogs
 	private baselimeUrl
+	private isLocalDev
 	constructor({
 		ctx,
 		apiKey,
@@ -46,17 +46,19 @@ export class BaselimeLogger {
 		flushAfterMs,
 		flushAfterLogs,
 		requestId,
-		baselimeUrl
+		baselimeUrl,
+		isLocalDev
 	}: {
 		ctx: ExecutionContext
 		apiKey: string
-		dataset: string
-		service: string
-		namespace: string
+		dataset?: string
+		service?: string
+		namespace?: string
 		baselimeUrl?: string
 		flushAfterMs?: number
 		flushAfterLogs?: number
 		requestId?: string | null
+		isLocalDev?: boolean
 	}) {
 		this.ctx = ctx
 		this.apiKey = apiKey
@@ -75,14 +77,35 @@ export class BaselimeLogger {
 
 	private async _log(message: string, level: string, data?: any) {
 		const tracingApi = await tracingApiPromise
+		let traceId: string | undefined
 		if (tracingApi) {
 			const span = tracingApi.trace.getActiveSpan()
-			const traceId = span?.spanContext().traceId
-			if (traceId) {
-				data = data ?? {}
-				data['traceId'] = traceId
-			}
+			traceId = span?.spanContext().traceId
 		}
+
+		if(this.isLocalDev) {
+			const colors = {
+				info: '\x1b[32m',
+				warning: '${colors[log.level]',
+				error: '\x1b[31m',
+				debug: '\x1b[35m',
+			}
+
+			const grey = `\x1b[90m`
+			const white = `\x1b[0m`
+			console.log(`${colors[level]}${level}${grey} - ${this.requestId} - ${white}${message}`)
+			if (data) {
+				console.log(`${grey} ${JSON.stringify(data, null, 2)}`)
+			}
+			return
+		}
+		/**
+		 * If no API key or context, we can't send logs so log them to sdtout
+		 */
+		if (!this.apiKey || !this.ctx) {
+			console.log(JSON.stringify({ message, level, ...data, requestId: this.requestId, traceId: data?.traceId }))
+		}
+
 		if (data && data.level) {
 			level = data.level
 			delete data.level
@@ -91,11 +114,9 @@ export class BaselimeLogger {
 		const log: BaselimeLog = {
 			message,
 			level,
+			traceId,
+			requestId: this.requestId,
 			...data,
-		}
-
-		if (this.requestId) {
-			log.requestId = this.requestId
 		}
 
 		this.logs.push(log)
@@ -146,30 +167,6 @@ export class BaselimeLogger {
 			const logsBody = JSON.stringify(this.logs)
 
 			try {
-
-				if (!this.apiKey) {
-
-					const colors = {
-						info: '\x1b[32m',
-						warning: '${colors[log.level]',
-						error: '\x1b[31m',
-						debug: '\x1b[35m',
-					}
-
-					const grey = `\x1b[90m`
-					const white = `\x1b[0m`
-					for (let log of this.logs) {
-						console.log(`${colors[log.level]}${log.level}${grey} - ${this.requestId} - ${white}${log.message}`)
-						delete log.level
-						delete log.message;
-						delete log.requestId;
-						if (Object.values(log).length > 0) {
-							console.log(`${grey} ${JSON.stringify(log, null, 2)}`)
-						}
-					}
-					return
-				}
-				console.log(`${this.baselimeUrl}/${this.dataset}/${this.service}/${this.namespace}`)
 				const res = await fetch(
 					`${this.baselimeUrl}/${this.dataset}/${this.service}/${this.namespace}`,
 					{
