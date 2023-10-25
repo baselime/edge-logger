@@ -65,10 +65,16 @@ For pretty formatted logs in wrangler add a .dev.var file to your wrangler proje
 IS_LOCAL_MODE=1
 ```
 
-and 
+and add the isLocalDev property when configuring the logger
 
-```
-
+```javascript
+export default {
+	async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+		const logger = new BaselimeLogger({
+			ctx,
+			apiKey: env.BASELIME_KEY,
+			isLocalDev: env.IS_LOCAL_DEV
+		})
 
 ```
 
