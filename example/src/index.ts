@@ -74,7 +74,7 @@ const config: ResolveConfigFn = (env: Env, _trigger) => {
 			url: 'https://otel.baselime.io/v1',
 			headers: { 'x-api-key': env.BASELIME_KEY },
 		},
-		service: { name: 'greetings' },
+		service: { name: 'my-worker' },
 	}
 }
 
