@@ -27,3 +27,4 @@ queue = "my-queue"
 #     completed BOOLEAN NOT NULL DEFAULT 0
 # );"
 [vars]
+BASELIME_KEY=""

@@ -8,13 +8,7 @@ OpenTelemetry aware logger for Cloudflare Workers and Vercel Edge Functions.
 npm i @baselime/edge-logger
 ```
 
-Add the API key
-
-```bash
-npx wrangler secret put BASELIME_KEY <your Baselime api key>
-```
-
-Add the Logger to your Cloudflare worker
+### Usage
 
 ```typescript
 import { BaselimeLogger } from '@baselime/edge-logger'
@@ -42,6 +36,27 @@ export default {
 }
 ```
 
-## Other examples
+## Supported methods
 
-- [Example usage with Queues and Open Telemetry](./example/src/index.ts)
+```javascript
+logger.info("This is an informational message", { payload: { foo: "bar" } });
+logger.warn("This is a warning message", { payload: { foo: "bar" } });
+logger.error("This is an error message", { payload: { foo: "bar" } });
+```
+
+### Contributing
+
+If you would like to contribute to the development of this library, please
+submit a pull request on GitHub.
+
+### License
+
+This library is licensed under the MIT License. See the [LICENSE](LICENSE) file
+for details.
+
+<!-- Badges -->
+
+[docs]: https://baselime.io/docs/
+[docs_badge]: https://img.shields.io/badge/docs-reference-blue.svg?style=flat-square
+[license]: https://opensource.org/licenses/MIT
+[license_badge]: https://img.shields.io/github/license/baselime/lambda-logger.svg?color=blue&style=flat-square&ghcache=unused
