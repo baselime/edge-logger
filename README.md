@@ -59,7 +59,7 @@ The BaselimeLogger class takes the following configuration options
 
 ## Local Dev
 
-For pretty formatted logs in wrangler add a .dev.var file to your wrangler project
+For pretty formatted logs in wrangler add a `.dev.var` file to your wrangler project
 
 ```.env
 IS_LOCAL_MODE=1
@@ -75,7 +75,6 @@ export default {
 			apiKey: env.BASELIME_KEY,
 			isLocalDev: env.IS_LOCAL_DEV
 		})
-
 ```
 
 ## Supported methods
