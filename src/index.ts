@@ -8,19 +8,19 @@ export type BaselimeLog = {
 	data: any
 }
 
-let tracingApi: typeof import('@opentelemetry/api') | null = null;
+let tracingApiPromise: Promise<typeof import('@opentelemetry/api') | null>;
 
-;(async () => {
-	try {
-		/**
-		 * Only load the tracing API if it's available
-		 * It can't be provided by this library as the version needs to match the opentelemetry version
-		 * provided by the user
-		 */
-		const api = await import('@opentelemetry/api')
-		tracingApi = api
-	} catch (_) {}
-})()
+try {
+	/**
+	 * Only load the tracing API if it's available
+	 * It can't be provided by this library as the version needs to match the opentelemetry version
+	 * provided by the user
+	 */
+	tracingApiPromise = import('@opentelemetry/api')
+} catch (_) {
+	tracingApiPromise = Promise.resolve(null)
+}
+
 
 export class BaselimeLogger {
 	private readonly ctx: ExecutionContext
@@ -74,6 +74,7 @@ export class BaselimeLogger {
 	}
 
 	private async _log(message: string, level: string, data?: any) {
+		const tracingApi = await tracingApiPromise
 		if (tracingApi) {
 			const span = tracingApi.trace.getActiveSpan()
 			const traceId = span?.spanContext().traceId
