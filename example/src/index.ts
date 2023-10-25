@@ -10,8 +10,10 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-import { BaselimeLogger } from '@baselime/edge-logger';
+
 import { instrument, ResolveConfigFn } from '@microlabs/otel-cf-workers'
+import { trace } from '@opentelemetry/api';
+import { BaselimeLogger } from '../../dist/index';
 export interface Env {
 	// Example binding to a Queue. Learn more at https://developers.cloudflare.com/queues/javascript-apis/
 	MY_QUEUE: Queue;
@@ -31,6 +33,11 @@ const handler =  {
 			namespace: 'fetch',
 			requestId: req.headers.get('cf-ray'),
 		})
+
+		const span = trace.getActiveSpan()
+		console.log(span?.spanContext().traceId)
+		if(span) span.setAttribute('name', 'value')
+
 		
 		logger.info('Hello world', { cfRay: req.headers.get('cf-ray'), foo: 'bar' })
 		// To send a message on a queue, we need to create the queue first

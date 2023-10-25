@@ -6,5 +6,6 @@
     "format": [
       "cjs",
       "esm"
-    ]
+    ],
+    "external": ["@opentelemetry/api"]
   }

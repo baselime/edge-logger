@@ -19,13 +19,11 @@
   "license": "MIT",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231016.0",
+    "@opentelemetry/api": "1.4.1",
     "@release-it/keep-a-changelog": "^4.0.0",
     "release-it": "^16.2.1",
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"
-  },
-  "dependencies": {
-    "@opentelemetry/api": "^1.6.0"
   }
 }
