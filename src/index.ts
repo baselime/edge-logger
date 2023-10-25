@@ -10,16 +10,17 @@ export type BaselimeLog = {
 
 let tracingApi: typeof import('@opentelemetry/api') | null = null;
 
-try {
-	/**
-	 * Only load the tracing API if it's available
-	 * It can't be provided by this library as the version needs to match the opentelemetry version
-	 * provided by the user
-	 */
-	const api = require('@opentelemetry/api');
-	tracingApi = api
-} catch (_) {
-}
+;(async () => {
+	try {
+		/**
+		 * Only load the tracing API if it's available
+		 * It can't be provided by this library as the version needs to match the opentelemetry version
+		 * provided by the user
+		 */
+		const api = await import('@opentelemetry/api')
+		tracingApi = api
+	} catch (_) {}
+})()
 
 export class BaselimeLogger {
 	private readonly ctx: ExecutionContext
@@ -74,8 +75,12 @@ export class BaselimeLogger {
 
 	private async _log(message: string, level: string, data?: any) {
 		if (tracingApi) {
-			const span = tracingApi.trace.getActiveSpan();
-			data['traceId'] = span?.spanContext().traceId;
+			const span = tracingApi.trace.getActiveSpan()
+			const traceId = span?.spanContext().traceId
+			if (traceId) {
+				data = data ?? {}
+				data['traceId'] = traceId
+			}
 		}
 		if (data && data.level) {
 			level = data.level
