@@ -18,7 +18,7 @@ try {
 	 */
 	const api = require('@opentelemetry/api');
 	tracingApi = api
-} catch() {
+} catch(_) {
 }
 
 export class BaselimeLogger {
