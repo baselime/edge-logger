@@ -13,7 +13,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup",
-    "dev": "npm link && tsup --watch & cd example && npm link @baselime/edge-logger && npm run dev"
+    "dev": "npm link && tsup --watch & cd example && npm link @baselime/edge-logger && npm run dev",
+    "release": "release-it"
   },
   "author": "",
   "license": "MIT",
