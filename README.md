@@ -85,6 +85,9 @@ logger.warn("This is a warning message", { payload: { foo: "bar" } });
 logger.error("This is an error message", { payload: { foo: "bar" } });
 ```
 
+## Contributor Alumni
+The Baselime Edge Logger was created for the [Baselime community](https://join.slack.com/t/baselimecommunity/shared_invite/zt-25rig7ul2-m06V0DdYWpFHu~qH3F7DhQ) and generously offered to Baselime by [Jacob Hands](github.com/jahands).
+
 ### Contributing
 
 If you would like to contribute to the development of this library, please
