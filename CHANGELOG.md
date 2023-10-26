@@ -11,14 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   
 ## [0.1.3] - 2023-10-25
 
-- better local dev logging options
+- Better local dev logging options
+
 
 ## [0.1.2] - 2023-10-25
-
-- esm
+- ESM support
   
 ## [0.1.1] - 2023-10-25
-
 - Initial Release
 
 ## [0.1.0]
