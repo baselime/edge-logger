@@ -1,6 +1,6 @@
 {
   "name": "@baselime/edge-logger",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "OpenTelemetry Aware logger for Cloudflare Workers and Vercel Edge Functions",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
