@@ -168,12 +168,14 @@ export class BaselimeLogger {
 
 			try {
 				const res = await fetch(
-					`${this.baselimeUrl}/${this.dataset}/${this.service}/${this.namespace}`,
+					`${this.baselimeUrl}/${this.dataset}`,
 					{
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
 							'x-api-key': this.apiKey,
+							'x-service': this.service,
+							'x-namespace': this.namespace,
 						},
 						body: logsBody,
 					}

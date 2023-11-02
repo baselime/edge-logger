@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Contributor Section in README.md
+- namespace and service are now headers
   
 ## [0.1.3] - 2023-10-25
 
