@@ -21,6 +21,19 @@ try {
 	tracingApiPromise = Promise.resolve(null)
 }
 
+export type BaselimeLoggerArgs = {
+	ctx: ExecutionContext
+	apiKey: string
+	dataset?: string
+	service?: string
+	namespace?: string
+	baselimeUrl?: string
+	flushAfterMs?: number
+	flushAfterLogs?: number
+	requestId?: string | null
+	isLocalDev?: boolean
+}
+
 export class BaselimeLogger {
 	private readonly ctx: ExecutionContext
 	private readonly apiKey: string
@@ -36,43 +49,22 @@ export class BaselimeLogger {
 	private flushAfterLogs: number
 	private baselimeUrl: string
 	private isLocalDev: boolean
-	constructor({
-		ctx,
-		apiKey,
-		dataset,
-		service,
-		namespace,
-		flushAfterMs,
-		flushAfterLogs,
-		requestId,
-		baselimeUrl,
-		isLocalDev,
-	}: {
-		ctx: ExecutionContext
-		apiKey: string
-		dataset?: string
-		service?: string
-		namespace?: string
-		baselimeUrl?: string
-		flushAfterMs?: number
-		flushAfterLogs?: number
-		requestId?: string | null
-		isLocalDev?: boolean
-	}) {
-		this.ctx = ctx
-		this.apiKey = apiKey
-		this.dataset = dataset
-		this.service = service
-		this.namespace = namespace
-		this.flushAfterMs = flushAfterMs ?? 10000
-		this.flushAfterLogs = flushAfterLogs ?? 100
-		this.baselimeUrl = baselimeUrl ?? 'https://events.baselime.io/v1'
-		if (requestId) {
-			this.requestId = requestId
+
+	constructor(args: BaselimeLoggerArgs) {
+		this.ctx = args.ctx
+		this.apiKey = args.apiKey
+		this.dataset = args.dataset
+		this.service = args.service
+		this.namespace = args.namespace
+		this.flushAfterMs = args.flushAfterMs ?? 10000
+		this.flushAfterLogs = args.flushAfterLogs ?? 100
+		this.baselimeUrl = args.baselimeUrl ?? 'https://events.baselime.io/v1'
+		if (args.requestId) {
+			this.requestId = args.requestId
 		} else {
 			this.requestId = crypto.randomUUID()
 		}
-		this.isLocalDev = isLocalDev
+		this.isLocalDev = args.isLocalDev
 	}
 
 	private async _log(message: string, level: string, data?: any) {
