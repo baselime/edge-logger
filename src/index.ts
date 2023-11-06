@@ -24,19 +24,19 @@ try {
 
 export class BaselimeLogger {
 	private readonly ctx: ExecutionContext
-	private readonly apiKey
-	private readonly dataset
-	private readonly service
-	private readonly namespace
+	private readonly apiKey: string
+	private readonly dataset: string
+	private readonly service: string
+	private readonly namespace: string
 	private readonly logs: BaselimeLog[] = []
-	private readonly requestId
+	private readonly requestId: string
 	// flushTimeout is a timeout set by setTimeout() to flush the logs after a certain amount of time
-	private flushTimeout: any | null = null
+	private flushTimeout: NodeJS.Timeout | null = null
 	private flushPromise: Promise<any> | null = null
-	private flushAfterMs
-	private flushAfterLogs
-	private baselimeUrl
-	private isLocalDev
+	private flushAfterMs: number
+	private flushAfterLogs: number
+	private baselimeUrl: string
+	private isLocalDev: boolean
 	constructor({
 		ctx,
 		apiKey,
@@ -73,6 +73,7 @@ export class BaselimeLogger {
 		} else {
 			this.requestId = crypto.randomUUID()
 		}
+		this.isLocalDev = isLocalDev
 	}
 
 	private async _log(message: string, level: string, data?: any) {
