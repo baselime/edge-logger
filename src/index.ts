@@ -1,4 +1,4 @@
-import { ExecutionContext } from "@cloudflare/workers-types"
+import { ExecutionContext } from '@cloudflare/workers-types'
 
 export type BaselimeLog = {
 	message: string
@@ -8,7 +8,7 @@ export type BaselimeLog = {
 	data: any
 }
 
-let tracingApiPromise: Promise<typeof import('@opentelemetry/api') | null>;
+let tracingApiPromise: Promise<typeof import('@opentelemetry/api') | null>
 
 try {
 	/**
@@ -21,58 +21,50 @@ try {
 	tracingApiPromise = Promise.resolve(null)
 }
 
+export type BaselimeLoggerArgs = {
+	ctx: ExecutionContext
+	apiKey: string
+	dataset?: string
+	service?: string
+	namespace?: string
+	baselimeUrl?: string
+	flushAfterMs?: number
+	flushAfterLogs?: number
+	requestId?: string | null
+	isLocalDev?: boolean
+}
 
 export class BaselimeLogger {
 	private readonly ctx: ExecutionContext
-	private readonly apiKey
-	private readonly dataset
-	private readonly service
-	private readonly namespace
+	private readonly apiKey: string
+	private readonly dataset: string
+	private readonly service: string
+	private readonly namespace: string
 	private readonly logs: BaselimeLog[] = []
-	private readonly requestId
+	private readonly requestId: string
 	// flushTimeout is a timeout set by setTimeout() to flush the logs after a certain amount of time
-	private flushTimeout: any | null = null
+	private flushTimeout: NodeJS.Timeout | null = null
 	private flushPromise: Promise<any> | null = null
-	private flushAfterMs
-	private flushAfterLogs
-	private baselimeUrl
-	private isLocalDev
-	constructor({
-		ctx,
-		apiKey,
-		dataset,
-		service,
-		namespace,
-		flushAfterMs,
-		flushAfterLogs,
-		requestId,
-		baselimeUrl,
-		isLocalDev
-	}: {
-		ctx: ExecutionContext
-		apiKey: string
-		dataset?: string
-		service?: string
-		namespace?: string
-		baselimeUrl?: string
-		flushAfterMs?: number
-		flushAfterLogs?: number
-		requestId?: string | null
-		isLocalDev?: boolean
-	}) {
-		this.ctx = ctx
-		this.apiKey = apiKey
-		this.dataset = dataset
-		this.service = service
-		this.namespace = namespace
-		this.flushAfterMs = flushAfterMs ?? 10000
-		this.flushAfterLogs = flushAfterLogs ?? 100
-		this.baselimeUrl = baselimeUrl ?? 'https://events.baselime.io/v1'
-		if (requestId) {
-			this.requestId = requestId
+	private flushAfterMs: number
+	private flushAfterLogs: number
+	private baselimeUrl: string
+	private isLocalDev: boolean
+
+	constructor(args: BaselimeLoggerArgs) {
+		this.ctx = args.ctx
+		this.apiKey = args.apiKey
+		this.dataset = args.dataset
+		this.service = args.service
+		this.namespace = args.namespace
+		this.flushAfterMs = args.flushAfterMs ?? 10000
+		this.flushAfterLogs = args.flushAfterLogs ?? 100
+		this.baselimeUrl = args.baselimeUrl ?? 'https://events.baselime.io/v1'
+		if (args.requestId) {
+			this.requestId = args.requestId
 		} else {
 			this.requestId = crypto.randomUUID()
 		}
+		this.isLocalDev = args.isLocalDev
 	}
 
 	private async _log(message: string, level: string, data?: any) {
@@ -83,7 +75,7 @@ export class BaselimeLogger {
 			traceId = span?.spanContext().traceId
 		}
 
-		if(this.isLocalDev) {
+		if (this.isLocalDev) {
 			const colors = {
 				info: '\x1b[32m',
 				warning: '${colors[log.level]',
@@ -160,26 +152,20 @@ export class BaselimeLogger {
 		const doFlush = async () => {
 			if (this.logs.length === 0) return // Nothing to do
 
-			// Make sure the last one is done before starting a flush
-			await this.flushPromise
-
 			const logsCount = this.logs.length
 			const logsBody = JSON.stringify(this.logs)
 
 			try {
-				const res = await fetch(
-					`${this.baselimeUrl}/${this.dataset}`,
-					{
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'x-api-key': this.apiKey,
-							'x-service': this.service,
-							'x-namespace': this.namespace,
-						},
-						body: logsBody,
-					}
-				)
+				const res = await fetch(`${this.baselimeUrl}/${this.dataset}`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'x-api-key': this.apiKey,
+						'x-service': this.service,
+						'x-namespace': this.namespace,
+					},
+					body: logsBody,
+				})
 				if (res.ok) {
 					// Remove the logs we sent
 					this.logs.splice(0, logsCount)
@@ -191,6 +177,9 @@ export class BaselimeLogger {
 				console.error(`Baselime failed to ingest logs: ${err}`)
 			}
 		}
+
+		// Make sure the last one is done before starting a flush
+		await this.flushPromise
 
 		this.flushPromise = doFlush()
 		await this.flushPromise
@@ -210,12 +199,14 @@ export class BaselimeLogger {
 	}
 
 	error(msg: string | Error | unknown, data?: any) {
-		const m: string =
-			msg instanceof Error
-				? msg.message + (msg.stack ? `: ${msg.stack}` : '')
-				: typeof msg === 'string'
-					? msg
-					: JSON.stringify(msg)
+		let m = ''
+		if (msg instanceof Error) {
+			m = msg.message + (msg.stack ? `: ${msg.stack}` : '')
+		} else if (typeof msg === 'string') {
+			m = msg
+		} else {
+			m = JSON.stringify(msg)
+		}
 		this._log(m, 'error', data)
 	}
 
