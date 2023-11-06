@@ -1,11 +1,6 @@
 {
-    "entry": [
-      "src/index.ts"
-    ],
-    "dts": true,
-    "format": [
-      "cjs",
-      "esm"
-    ],
-    "external": ["@opentelemetry/api"]
-  }
+	"entry": ["src/index.ts"],
+	"dts": true,
+	"format": ["cjs", "esm"],
+	"external": ["@opentelemetry/api"]
+}
