@@ -160,9 +160,6 @@ export class BaselimeLogger {
 		const doFlush = async () => {
 			if (this.logs.length === 0) return // Nothing to do
 
-			// Make sure the last one is done before starting a flush
-			await this.flushPromise
-
 			const logsCount = this.logs.length
 			const logsBody = JSON.stringify(this.logs)
 
@@ -191,6 +188,9 @@ export class BaselimeLogger {
 				console.error(`Baselime failed to ingest logs: ${err}`)
 			}
 		}
+
+		// Make sure the last one is done before starting a flush
+		await this.flushPromise
 
 		this.flushPromise = doFlush()
 		await this.flushPromise
