@@ -1,7 +1,9 @@
 {
-    "compilerOptions": {
-        "module": "NodeNext",
-        "moduleResolution": "nodenext",
-        "allowImportingTsExtensions": true
-    }
+	"compilerOptions": {
+		"module": "NodeNext",
+		"moduleResolution": "nodenext",
+		"allowImportingTsExtensions": true,
+		"emitDeclarationOnly": true,
+		"declaration": true
+	}
 }
