@@ -8,7 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Fix isLocalDev
-- add biome for codeformatting
+- Improve flushing behaviour
+
+Thanks @jahands!
+
+- Add [biome](https://biomejs.dev) for codeformatting
   
 ## [0.2.0] - 2023-11-02
 
