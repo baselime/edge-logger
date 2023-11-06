@@ -14,7 +14,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup",
     "dev": "npm link && tsup --watch & cd example && npm link @baselime/edge-logger && npm run dev",
-    "release": "release-it"
+    "release": "release-it",
+    "format:fix": "prettier --write \"**/*.ts\""
   },
   "author": "",
   "license": "MIT",
@@ -26,5 +27,8 @@
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"
+  },
+  "dependencies": {
+    "prettier": "^3.0.3"
   }
 }

@@ -1,4 +1,4 @@
-import { ExecutionContext } from "@cloudflare/workers-types"
+import { ExecutionContext } from '@cloudflare/workers-types'
 
 export type BaselimeLog = {
 	message: string
@@ -8,7 +8,7 @@ export type BaselimeLog = {
 	data: any
 }
 
-let tracingApiPromise: Promise<typeof import('@opentelemetry/api') | null>;
+let tracingApiPromise: Promise<typeof import('@opentelemetry/api') | null>
 
 try {
 	/**
@@ -20,7 +20,6 @@ try {
 } catch (_) {
 	tracingApiPromise = Promise.resolve(null)
 }
-
 
 export class BaselimeLogger {
 	private readonly ctx: ExecutionContext
@@ -47,7 +46,7 @@ export class BaselimeLogger {
 		flushAfterLogs,
 		requestId,
 		baselimeUrl,
-		isLocalDev
+		isLocalDev,
 	}: {
 		ctx: ExecutionContext
 		apiKey: string
@@ -84,7 +83,7 @@ export class BaselimeLogger {
 			traceId = span?.spanContext().traceId
 		}
 
-		if(this.isLocalDev) {
+		if (this.isLocalDev) {
 			const colors = {
 				info: '\x1b[32m',
 				warning: '${colors[log.level]',
@@ -165,19 +164,16 @@ export class BaselimeLogger {
 			const logsBody = JSON.stringify(this.logs)
 
 			try {
-				const res = await fetch(
-					`${this.baselimeUrl}/${this.dataset}`,
-					{
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'x-api-key': this.apiKey,
-							'x-service': this.service,
-							'x-namespace': this.namespace,
-						},
-						body: logsBody,
-					}
-				)
+				const res = await fetch(`${this.baselimeUrl}/${this.dataset}`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'x-api-key': this.apiKey,
+						'x-service': this.service,
+						'x-namespace': this.namespace,
+					},
+					body: logsBody,
+				})
 				if (res.ok) {
 					// Remove the logs we sent
 					this.logs.splice(0, logsCount)
@@ -211,12 +207,14 @@ export class BaselimeLogger {
 	}
 
 	error(msg: string | Error | unknown, data?: any) {
-		const m: string =
-			msg instanceof Error
-				? msg.message + (msg.stack ? `: ${msg.stack}` : '')
-				: typeof msg === 'string'
-					? msg
-					: JSON.stringify(msg)
+		let m = ''
+		if (msg instanceof Error) {
+			m = msg.message + (msg.stack ? `: ${msg.stack}` : '')
+		} else if (typeof msg === 'string') {
+			m = msg
+		} else {
+			m = JSON.stringify(msg)
+		}
 		this._log(m, 'error', data)
 	}
 
