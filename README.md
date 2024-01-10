@@ -3,7 +3,7 @@
 [![Latest Release][release_badge]][release]
 [![License][license_badge]][license]
 
-OpenTelemetry aware logger for Edge Runtimes. 
+OpenTelemetry aware logger for Edge Runtimes.
 
 Fully tested with:
 - Cloudflare Workers
@@ -16,7 +16,7 @@ Fully tested with:
 npm i @baselime/edge-logger
 ```
 
-### Usage
+### Example
 
 ```typescript
 import { BaselimeLogger } from '@baselime/edge-logger'
@@ -46,17 +46,15 @@ export default {
 }
 ```
 
-> Note the `ctx.waitUntil(logger.flush());` before the return statement of the function. 
+> Note the `ctx.waitUntil(logger.flush());` before the return statement of the function.
 
-
-## Supported methods
+## Supported Methods
 
 ```typescript
 logger.info("This is an informational message", { payload: { foo: "bar" } });
 logger.warn("This is a warning message", { payload: { foo: "bar" } });
 logger.error("This is an error message", { payload: { foo: "bar" } });
 ```
-
 
 ## Local Development
 
@@ -86,7 +84,6 @@ export default {
 
 Local development mode is disabled by default to improve performance.
 
-
 ## Configuration
 
 The BaselimeLogger class takes the following configuration options
@@ -103,19 +100,17 @@ The BaselimeLogger class takes the following configuration options
 | `requestId`     | `string` (optional) |  Request ID   |
 | `isLocalDev`    | `boolean` (optional)|  Indicates if it's for local development |
 
-
 ## Contributor Alumni
-The Baselime Edge Logger was created for the [Baselime community](https://join.slack.com/t/baselimecommunity/shared_invite/zt-25rig7ul2-m06V0DdYWpFHu~qH3F7DhQ) and generously offered to Baselime by [Jacob Hands](github.com/jahands).
+
+The Baselime Edge Logger was created for the [Baselime community](https://join.slack.com/t/baselimecommunity/shared_invite/zt-25rig7ul2-m06V0DdYWpFHu~qH3F7DhQ) and generously offered to Baselime by [Jacob Hands](https://github.com/jahands).
 
 ### Contributing
 
-If you would like to contribute to the development of this library, please
-submit a pull request on GitHub.
+If you would like to contribute to the development of this library, please submit a pull request on GitHub.
 
 ### License
 
-This library is licensed under the MIT License. See the [LICENSE](LICENSE) file
-for details.
+This library is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 <!-- Badges -->
 
