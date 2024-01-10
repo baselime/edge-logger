@@ -5,7 +5,8 @@ export type BaselimeLog = {
 	error?: string;
 	requestId: string;
 	level: string;
-	data: any;
+	traceId: string | undefined;
+	[key: string]: unknown;
 };
 
 let tracingApiPromise: Promise<typeof import("@opentelemetry/api") | null>;
@@ -44,7 +45,7 @@ export class BaselimeLogger {
 	private readonly requestId: string;
 	// flushTimeout is a timeout set by setTimeout() to flush the logs after a certain amount of time
 	private flushTimeout: NodeJS.Timeout | null = null;
-	private flushPromise: Promise<any> | null = null;
+	private flushPromise: Promise<void> | null = null;
 	private flushAfterMs: number;
 	private flushAfterLogs: number;
 	private baselimeUrl: string;
@@ -67,7 +68,11 @@ export class BaselimeLogger {
 		this.isLocalDev = args.isLocalDev;
 	}
 
-	private async _log(message: string, level: string, data?: any) {
+	private async _log(
+		message: string,
+		level: string,
+		data?: Record<string, unknown>,
+	) {
 		const tracingApi = await tracingApiPromise;
 		let traceId: string | undefined;
 		if (tracingApi) {
@@ -83,8 +88,8 @@ export class BaselimeLogger {
 				debug: "\x1b[35m",
 			};
 
-			const grey = `\x1b[90m`;
-			const white = `\x1b[0m`;
+			const grey = "\x1b[90m";
+			const white = "\x1b[0m";
 			console.log(
 				`${colors[level]}${level}${grey} - ${this.requestId} - ${white}${message}`,
 			);
@@ -93,33 +98,21 @@ export class BaselimeLogger {
 			}
 			return;
 		}
+
+		const log: BaselimeLog = {
+			message,
+			level: data?.level || level,
+			traceId,
+			timestamp: Date.now(),
+			requestId: this.requestId,
+			...{ ...data, level: undefined },
+		};
 		/**
 		 * If no API key or context, we can't send logs so log them to sdtout
 		 */
 		if (!this.apiKey || !this.ctx) {
-			console.log(
-				JSON.stringify({
-					message,
-					level,
-					...data,
-					requestId: this.requestId,
-					traceId: data?.traceId,
-				}),
-			);
+			console.log(JSON.stringify(log));
 		}
-
-		if (data && data.level) {
-			level = data.level;
-			delete data.level;
-		}
-
-		const log: BaselimeLog = {
-			message,
-			level,
-			traceId,
-			requestId: this.requestId,
-			...data,
-		};
 
 		this.logs.push(log);
 
@@ -202,19 +195,19 @@ export class BaselimeLogger {
 		this.flushPromise = null;
 	}
 
-	log(msg: string, data?: any) {
+	log(msg: string, data?: Record<string, unknown>) {
 		this._log(msg, "info", data);
 	}
 
-	info(msg: string, data?: any) {
+	info(msg: string, data?: Record<string, unknown>) {
 		this._log(msg, "info", data);
 	}
 
-	warn(msg: string, data?: any) {
+	warn(msg: string, data?: Record<string, unknown>) {
 		this._log(msg, "warning", data);
 	}
 
-	error(msg: string | Error | unknown, data?: any) {
+	error(msg: string | Error | unknown, data?: Record<string, unknown>) {
 		let m = "";
 		if (msg instanceof Error) {
 			m = msg.message + (msg.stack ? `: ${msg.stack}` : "");
@@ -226,7 +219,7 @@ export class BaselimeLogger {
 		this._log(m, "error", data);
 	}
 
-	debug(msg: string, data?: any) {
+	debug(msg: string, data?: Record<string, unknown>) {
 		this._log(msg, "debug", data);
 	}
 }
