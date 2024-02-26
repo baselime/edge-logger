@@ -58,13 +58,13 @@ logger.error("This is an error message", { payload: { foo: "bar" } });
 
 ## Local Development
 
-To get logs appropriately formatted in your local development environment using wrangler, add the `IS_LOCAL_MODE` environment variable to your `.dev.var` file.
+To get logs appropriately formatted in your local development environment using wrangler, add the `IS_LOCAL_DEV` environment variable to your `.dev.var` file.
 
 ```.env
 IS_LOCAL_MODE=1
 ```
 
-And use it when configurting the `BaselimeLogger`.
+And use it when configuring the `BaselimeLogger`.
 
 ```typescript
 export default {
@@ -77,7 +77,7 @@ export default {
 
     logger.info("Pretty Formatted Logs", { foo: "bar" });
 
-    ctx.waitUntill(logger.flush())
+    ctx.waitUntil(logger.flush())
   }
 }
 ```
