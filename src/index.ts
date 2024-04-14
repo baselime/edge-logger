@@ -1,5 +1,5 @@
 import { ExecutionContext } from "@cloudflare/workers-types";
-
+import { trace } from "@opentelemetry/api";
 export type BaselimeLog = {
 	message: string;
 	error?: string;
@@ -8,19 +8,6 @@ export type BaselimeLog = {
 	traceId: string | undefined;
 	[key: string]: unknown;
 };
-
-let tracingApiPromise: Promise<typeof import("@opentelemetry/api") | null>;
-
-try {
-	/**
-	 * Only load the tracing API if it's available
-	 * It can't be provided by this library as the version needs to match the opentelemetry version
-	 * provided by the user
-	 */
-	tracingApiPromise = import("@opentelemetry/api");
-} catch (_) {
-	tracingApiPromise = Promise.resolve(null);
-}
 
 export type BaselimeLoggerArgs = {
 	ctx: ExecutionContext;
@@ -73,12 +60,8 @@ export class BaselimeLogger {
 		level: string,
 		data?: Record<string, unknown>,
 	) {
-		const tracingApi = await tracingApiPromise;
-		let traceId: string | undefined;
-		if (tracingApi) {
-			const span = tracingApi.trace.getActiveSpan();
-			traceId = span?.spanContext().traceId;
-		}
+		const span = trace.getActiveSpan();
+		const traceId = span?.spanContext().traceId;
 
 		if (this.isLocalDev) {
 			const colors = {

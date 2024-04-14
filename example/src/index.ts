@@ -12,7 +12,6 @@
  */
 
 import { instrument, ResolveConfigFn } from "@microlabs/otel-cf-workers";
-import { context, trace } from "@opentelemetry/api";
 import { BaselimeLogger } from "../../dist/index";
 export interface Env {
 	// Example binding to a Queue. Learn more at https://developers.cloudflare.com/queues/javascript-apis/
@@ -32,6 +31,7 @@ const handler = {
 		const logger = new BaselimeLogger({
 			ctx,
 			apiKey: env.BASELIME_KEY,
+			isLocalDev: true,
 			service: "my-worker",
 			dataset: "cloudflare",
 			namespace: "fetch",
