@@ -66,7 +66,7 @@ export class BaselimeLogger {
 		if (this.isLocalDev) {
 			const colors = {
 				info: "\x1b[32m",
-				warning: "${colors[log.level]",
+				warning: "\x1b[33m",
 				error: "\x1b[31m",
 				debug: "\x1b[35m",
 			};
@@ -84,11 +84,11 @@ export class BaselimeLogger {
 
 		const log: BaselimeLog = {
 			message,
-			level: data?.level || level,
+			level: (data?.level as string) || level,
 			traceId,
 			timestamp: Date.now(),
 			requestId: this.requestId,
-			...{ ...data, level: undefined },
+			...data,
 		};
 		/**
 		 * If no API key or context, we can't send logs so log them to sdtout
