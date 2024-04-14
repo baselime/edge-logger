@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - add timestamps automatically
+- always import opentelemetry api
   
 ## [0.2.1] - 2023-11-06
 
