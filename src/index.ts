@@ -41,7 +41,7 @@ export class BaselimeLogger {
 	constructor(args: BaselimeLoggerArgs) {
 		this.ctx = args.ctx;
 		this.apiKey = args.apiKey;
-		this.dataset = args.dataset;
+		this.dataset = args.dataset ?? "edge-logger";
 		this.service = args.service;
 		this.namespace = args.namespace;
 		this.flushAfterMs = args.flushAfterMs ?? 10000;
