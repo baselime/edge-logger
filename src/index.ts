@@ -37,6 +37,7 @@ export class BaselimeLogger {
 	private flushAfterLogs: number;
 	private baselimeUrl: string;
 	private isLocalDev: boolean;
+	private monotonicTimestamp: number;
 
 	constructor(args: BaselimeLoggerArgs) {
 		this.ctx = args.ctx;
@@ -53,6 +54,7 @@ export class BaselimeLogger {
 			this.requestId = crypto.randomUUID();
 		}
 		this.isLocalDev = args.isLocalDev;
+		this.monotonicTimestamp = Date.now();
 	}
 
 	private async _log(
@@ -82,11 +84,19 @@ export class BaselimeLogger {
 			return;
 		}
 
+		let timestamp = Date.now();
+		if (timestamp > this.monotonicTimestamp) {
+			this.monotonicTimestamp = timestamp;
+		} else {
+			timestamp = this.monotonicTimestamp;
+			this.monotonicTimestamp += 1;
+		}
+
 		const log: BaselimeLog = {
 			message,
 			level: (data?.level as string) || level,
 			traceId,
-			timestamp: Date.now(),
+			timestamp,
 			requestId: this.requestId,
 			...data,
 		};
