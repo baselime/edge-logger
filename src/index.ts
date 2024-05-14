@@ -22,6 +22,24 @@ export type BaselimeLoggerArgs = {
 	isLocalDev?: boolean;
 };
 
+class MonotonicTimestamp {
+	private monotonicTimestamp: number;
+	constructor() {
+		this.monotonicTimestamp = Date.now();
+	}
+
+	now() {
+		let timestamp = Date.now();
+		if (timestamp > this.monotonicTimestamp) {
+			this.monotonicTimestamp = timestamp;
+		} else {
+			timestamp = this.monotonicTimestamp;
+			this.monotonicTimestamp += 1;
+		}
+		return timestamp;
+	}
+}
+
 export class BaselimeLogger {
 	private readonly ctx: ExecutionContext;
 	private readonly apiKey: string;
@@ -37,7 +55,7 @@ export class BaselimeLogger {
 	private flushAfterLogs: number;
 	private baselimeUrl: string;
 	private isLocalDev: boolean;
-	private monotonicTimestamp: number;
+	private timestamp: MonotonicTimestamp;
 
 	constructor(args: BaselimeLoggerArgs) {
 		this.ctx = args.ctx;
@@ -54,7 +72,7 @@ export class BaselimeLogger {
 			this.requestId = crypto.randomUUID();
 		}
 		this.isLocalDev = args.isLocalDev;
-		this.monotonicTimestamp = Date.now();
+		this.timestamp = new MonotonicTimestamp();
 	}
 
 	private async _log(
@@ -84,19 +102,11 @@ export class BaselimeLogger {
 			return;
 		}
 
-		let timestamp = Date.now();
-		if (timestamp > this.monotonicTimestamp) {
-			this.monotonicTimestamp = timestamp;
-		} else {
-			timestamp = this.monotonicTimestamp;
-			this.monotonicTimestamp += 1;
-		}
-
 		const log: BaselimeLog = {
 			message,
 			level: (data?.level as string) || level,
 			traceId,
-			timestamp,
+			timestamp: this.timestamp.now(),
 			requestId: this.requestId,
 			...data,
 		};
