@@ -31,7 +31,7 @@ class MonotonicTimestamp {
 	now() {
 		let timestamp = Date.now();
 		if (timestamp > this.monotonicTimestamp) {
-			this.monotonicTimestamp = timestamp;
+			this.monotonicTimestamp = timestamp + 1;
 		} else {
 			timestamp = this.monotonicTimestamp;
 			this.monotonicTimestamp += 1;
