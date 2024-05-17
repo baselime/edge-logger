@@ -12,7 +12,7 @@
  */
 
 import { instrument, ResolveConfigFn } from "@microlabs/otel-cf-workers";
-import { BaselimeLogger } from "../../dist/index";
+import { BaselimeLogger } from "../../src/index";
 export interface Env {
 	// Example binding to a Queue. Learn more at https://developers.cloudflare.com/queues/javascript-apis/
 	MY_QUEUE: Queue;
@@ -28,27 +28,40 @@ const handler = {
 		env: Env,
 		ctx: ExecutionContext,
 	): Promise<Response> {
+		const sts = new SlowTimestamp();
 		const logger = new BaselimeLogger({
 			ctx,
-			apiKey: env.BASELIME_KEY,
-			isLocalDev: true,
+			apiKey: "356a6a2a1c62d634f1e68d69cd02aae1ca9f4734",
 			service: "my-worker",
 			dataset: "cloudflare",
-			namespace: "fetch",
+			namespace: "my-worker",
 			requestId: req.headers.get("cf-ray"),
+			// timestamp: new SlowTimestamp(),
 		});
 
 		logger.info("Hello world", {
 			cfRay: req.headers.get("cf-ray"),
 			foo: "bar",
+			host: req.headers.get("host"),
+		});
+
+		logger.info("Log 2", {
+			cfRay: req.headers.get("cf-ray"),
+			foo: "bar",
+		});
+		const st = await sts.now();
+		const start = Date.now();
+		const ids = Array(1_000_000)
+			.fill(null)
+			.map((_) => crypto.randomUUID());
+		const end = Date.now();
+		const after = await sts.now();
+		logger.info("Generated ids", {
+			duration: after - st,
+			badDuration: end - start,
 		});
 		// To send a message on a queue, we need to create the queue first
 		// https://developers.cloudflare.com/queues/get-started/#3-create-a-queue
-		await env.MY_QUEUE.send({
-			url: req.url,
-			method: req.method,
-			headers: Object.fromEntries(req.headers),
-		});
 
 		ctx.waitUntil(logger.flush());
 		return new Response("Sent message to the queue");
