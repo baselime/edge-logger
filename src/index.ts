@@ -28,6 +28,7 @@ export type BaselimeLoggerArgs = {
 // }
 export class SlowTimestamp {
 	async now() {
+		// @ts-ignore
 		await scheduler.wait(1);
 		return Date.now();
 	}
