@@ -3,28 +3,6 @@ main = "src/index.ts"
 compatibility_date = "2023-10-16"
 logpush=true
 compatibility_flags = [ "nodejs_compat" ]
-# Bind a Queue producer. Use this binding to schedule an arbitrary task that may be processed later by a Queue consumer.
-# Docs: https://developers.cloudflare.com/queues/get-started
-[[queues.producers]]
-binding = "MY_QUEUE"
-queue = "my-queue"
 
-# Bind a Queue consumer. Queue Consumers can retrieve tasks scheduled by Producers to act on them.
-# Docs: https://developers.cloudflare.com/queues/get-started
-[[queues.consumers]]
-queue = "my-queue"
-# Optional: Configure batching and retries: https://developers.cloudflare.com/queues/learning/batching-retries/
-# max_batch_size = 10
-# max_batch_timeout = 30
-# max_retries = 10
-# dead_letter_queue = "my-queue-dlq"
-
-# wrangler d1 execute EXAMPLE --command "CREATE TABLE todos (
-#     id INT AUTO_INCREMENT PRIMARY KEY,
-#     title VARCHAR(255) NOT NULL,
-#     description TEXT,
-#     due_date DATE,
-#     completed BOOLEAN NOT NULL DEFAULT 0
-# );"
 [vars]
-BASELIME_KEY=""
+BASELIME_KEY="356a6a2a1c62d634f1e68d69cd02aae1ca9f4734"

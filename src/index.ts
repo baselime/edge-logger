@@ -1,5 +1,6 @@
 import { ExecutionContext } from "@cloudflare/workers-types";
 import { trace } from "@opentelemetry/api";
+
 export type BaselimeLog = {
 	message: string;
 	error?: string;
@@ -22,6 +23,34 @@ export type BaselimeLoggerArgs = {
 	isLocalDev?: boolean;
 };
 
+// export interface Timestamp {
+// 	now(): number;
+// }
+export class SlowTimestamp {
+	async now() {
+		await scheduler.wait(1);
+		return Date.now();
+	}
+}
+
+export class MonotonicTimestamp {
+	private monotonicTimestamp: number;
+	constructor() {
+		this.monotonicTimestamp = Date.now();
+	}
+
+	now() {
+		let timestamp = Date.now();
+		if (timestamp > this.monotonicTimestamp) {
+			this.monotonicTimestamp = timestamp + 1;
+		} else {
+			timestamp = this.monotonicTimestamp;
+			this.monotonicTimestamp += 1;
+		}
+		return timestamp;
+	}
+}
+
 export class BaselimeLogger {
 	private readonly ctx: ExecutionContext;
 	private readonly apiKey: string;
@@ -37,6 +66,7 @@ export class BaselimeLogger {
 	private flushAfterLogs: number;
 	private baselimeUrl: string;
 	private isLocalDev: boolean;
+	private timestamp: MonotonicTimestamp;
 
 	constructor(args: BaselimeLoggerArgs) {
 		this.ctx = args.ctx;
@@ -53,6 +83,7 @@ export class BaselimeLogger {
 			this.requestId = crypto.randomUUID();
 		}
 		this.isLocalDev = args.isLocalDev;
+		this.timestamp = new MonotonicTimestamp();
 	}
 
 	private async _log(
@@ -86,7 +117,7 @@ export class BaselimeLogger {
 			message,
 			level: (data?.level as string) || level,
 			traceId,
-			timestamp: Date.now(),
+			timestamp: this.timestamp.now(),
 			requestId: this.requestId,
 			...data,
 		};
@@ -96,7 +127,6 @@ export class BaselimeLogger {
 		if (!this.apiKey || !this.ctx) {
 			console.log(JSON.stringify(log));
 		}
-
 		this.logs.push(log);
 
 		if (this.logs.length >= this.flushAfterLogs) {
@@ -136,7 +166,6 @@ export class BaselimeLogger {
 		skipIfInProgress = false,
 	}: { skipIfInProgress?: boolean } = {}) {
 		if (skipIfInProgress && this.flushPromise) return;
-
 		const doFlush = async () => {
 			if (this.logs.length === 0) return; // Nothing to do
 
